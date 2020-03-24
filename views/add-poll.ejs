@@ -1,0 +1,139 @@
+<div class="container mt-4">
+    <div class="polls-form-container">
+        <div class="poll-form">
+
+            <form action="/polls/add" method="post" id="add-poll-form">
+
+                <div class="form-group">
+                    <input type="hidden" name="user_id" id="user_id" value="<%=user._id%>">
+                </div>
+
+                <div class="form-group">
+                    <label for="question">Question:</label>
+                    <input type="text" placeholder="Question" class="form-control" id="question" name="question">
+                </div>
+
+                <div class="form-group">
+                    <label for="author">Author:</label>
+                    <input type="text" disabled placeholder="Author" class="form-control" id="author" name="author"
+                        value="<%=user.username%>">
+                </div>
+
+                <div class="form-group">
+                    <label for="question">Options:</label>
+                    <div id="options-container"></div>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-12 mb-2">
+                        <button type="submit" class="btn btn-block btn-primary">Create Poll</button>
+                    </div>
+                    <div class="col-6">
+                        <button id="add-option-btn" class="btn btn-block btn-info">Add Option</button>
+                    </div>
+                    <div class="col-6">
+                        <button id="remove-option-btn" class="btn btn-block btn-danger">Remove Option</button>
+                    </div>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    let numberOfOptions = localStorage.getItem("numberOfOptions") || 2;
+    if (localStorage.getItem("numberOfOptions") == undefined){
+        numberOfOptions = 2
+        localStorage.setItem("numberOfOptions", numberOfOptions)
+    }
+    const optionsContainer = document.getElementById("options-container");
+    const addOptionButton = document.getElementById("add-option-btn");
+    const removeOptionButton = document.getElementById("remove-option-btn");
+    const questionInput = document.getElementById("question")
+    const addPollForm = document.getElementById("add-poll-form");
+    const user_id = document.getElementById("user_id").value;
+
+    addPollForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        let options = [];
+
+        for (let index = 0; index < numberOfOptions; index++) {
+            if (localStorage.getItem(`option-${index}`) != undefined) {
+                options.push({
+                    opinion: localStorage.getItem(`option-${index}`)
+                })
+            }
+        }
+
+        fetch("/polls/add", {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            method: "POST",
+            body: JSON.stringify({
+                user_id,
+                question: questionInput.value,
+                options
+            })
+        })
+        .then(res => res.json())
+        .then(data => console.log(data))
+
+        localStorage.setItem(`question`, "");
+        localStorage.setItem("numberOfOptions", 2)
+        for (let index = 0; index < numberOfOptions; index++) {
+            if (localStorage.getItem(`option-${index}`) != undefined) {
+                localStorage.setItem(`option-${index}`, "");
+            }
+        }
+
+        setTimeout(() => {
+            window.location.href = "/profile"
+        }, 500)
+    })
+
+    addOptionButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (localStorage.getItem("numberOfOptions") == 5){
+            return window.location.reload();
+        }
+        localStorage.setItem("numberOfOptions", parseInt(numberOfOptions) + 1)
+        return window.location.reload();
+    })
+
+    removeOptionButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (localStorage.getItem("numberOfOptions") == 2){
+            return window.location.reload();
+        }
+        localStorage.setItem("numberOfOptions", numberOfOptions - 1)
+        return window.location.reload();
+    })
+
+    questionInput.addEventListener("change", (e) => {
+        localStorage.setItem(`question`, e.target.value);
+    })
+
+    if (localStorage.getItem(`question`) != undefined) {
+        questionInput.setAttribute("value", localStorage.getItem(`question`));
+    }
+
+    for (let index = 0; index < numberOfOptions; index++) {
+        const input = document.createElement("input");
+        if (localStorage.getItem(`option-${index}`) != undefined) {
+            input.setAttribute("value", localStorage.getItem(`option-${index}`));
+        }
+        input.setAttribute("class", "form-control mb-2");
+        input.setAttribute("id", `option-${index+1}`);
+        input.setAttribute("name", `option-${index+1}`);
+        input.setAttribute("placeholder", `Option ${index+1}`);
+        input.addEventListener("change", (e) => {
+            localStorage.setItem(`option-${index}`, e.target.value);
+        })
+        optionsContainer.appendChild(input);
+    }
+</script>

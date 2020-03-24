@@ -1,0 +1,273 @@
+<style>
+    body {
+        background-color: rgb(217, 217, 236);
+    }
+
+    .polls-form-container {
+        margin: 20px auto;
+        max-width: 70%;
+        padding: 30px 50px;
+        background-color: #fff;
+        border-radius: 30px;
+    }
+
+    .polls-container {
+        margin: 20px auto;
+    }
+
+    .poll-item {
+        display: flex;
+        padding: 30px 50px;
+        margin-bottom: 50px;
+        background-color: #fff;
+        border-radius: 30px;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .poll-item-content {
+        width: 50%;
+    }
+
+    .poll-item-content>* {
+        margin-bottom: 20px;
+    }
+
+    .poll-item-chart {
+        width: 40%;
+    }
+
+    .poll-item form {
+        margin-top: 20px;
+    }
+
+    .poll-item form>* {
+        margin-bottom: 20px;
+    }
+
+    @media (min-width: 320px) and (max-width: 1024px) {
+        .poll-item-content {
+            width: 100%;
+        }
+
+        .poll-item-chart {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="polls-container">
+        <div class="poll-item">
+            <div class="poll-item-content">
+                <h2><%= poll.question %></h2>
+                <h6>Created By: <%= author.username %></h6>
+                <h6>Answered By: <%= poll.totalVoters %> Person (People)</h6>
+
+                <input type="hidden" value="<%=poll._id%>" id="poll_id" name="poll_id" />
+
+                <% if (disabled == "disabled") { %>
+                <form class="poll-item-edit-form" poll-target-id="<%=poll._id%>" id="edit-vote-form">
+                    <input type="hidden" value="<%=user._id%>" id="current-user-id" />
+                    <% poll.options.forEach(function(option, optionIndex){ %>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <input type="radio" aria-label="Radio button for following text input"
+                                    id="poll--option-<%=optionIndex%>" name="poll-1" value="<%=optionIndex%>" required>
+                            </div>
+                        </div>
+                        <input type="text" disabled value="<%=option.opinion%>" class="form-control"
+                            aria-label="Text input with radio button">
+                    </div>
+                    <% }); %>
+                    <div class="form-group row">
+                        <div class="col-6">
+                            <button type="submit" class="btn btn-warning btn-block btn-edit-option">Edit Option</button>
+                        </div>
+                        <div class="col-6">
+                            <button type="reset" class="btn btn-dark  btn-block">Reset</button>
+                        </div>
+                    </div>
+                </form>
+                <% } else { %>
+                <form class="poll-item-form" poll-target-id="<%=poll._id%>" id="add-vote-form">
+                    <input type="hidden" value="<%=user._id%>" id="current-user-id">
+                    <% poll.options.forEach(function(option, optionIndex){ %>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <input type="radio" aria-label="Radio button for following text input"
+                                    id="poll-1-option-<%=optionIndex%>" name="poll-1" value="<%=optionIndex%>"
+                                    class="poll-1">
+                            </div>
+                        </div>
+                        <input type="text" disabled value="<%=option.opinion%>" class="form-control"
+                            aria-label="Text input with radio button">
+                    </div>
+                    <% }); %>
+                    <div class="form-group row">
+                        <div class="col-6">
+                            <button type="submit" class="btn btn-primary btn-block">Submit</button>
+                        </div>
+                        <div class="col-6">
+                            <button type="reset" class="btn btn-dark btn-block">Reset</button>
+                        </div>
+                    </div>
+                </form>
+                <% } %>
+                <a href="/" class="btn btn-info mt-2">Back</a>
+            </div>
+
+            <div class="poll-item-chart">
+                <% if (poll.totalVoters == 0) { %>
+                <h2>No data to display yet</h2>
+                <% } else { %>
+                <canvas id="chart-poll-1" width="100%" height="100%"></canvas>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.onload = function () {
+        let pollItemForm = document.querySelector("#add-vote-form")
+        let pollItemEditForm = document.querySelector("#edit-vote-form")
+        let editOptionButtons = document.querySelector(".btn-edit-option");
+        let pollID = document.getElementById("poll_id").value;
+
+        let listOfOptions = []
+        let listOfVoters = []
+
+        if (document.getElementById("chart-poll-1") != null) {
+            fetch(`/polls/${pollID}`)
+                .then(res => {
+                    return res.json()
+                })
+                .then(data => {
+                    const poll = data.data;
+
+                    poll.options.forEach((option, optionIndex) => {
+                        //listOfOptions.push(`Option ${optionIndex+1}`)
+                        listOfOptions.push(`${option.opinion}`)
+                        listOfVoters.push(option.votersCount)
+                    })
+                    var ctx = document.getElementById('chart-poll-1').getContext('2d');
+                    var myChart = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: listOfOptions,
+                            datasets: [{
+                                label: '# of Votes',
+                                data: listOfVoters,
+                                backgroundColor: [
+                                    'rgba(255, 99, 132, 0.2)',
+                                    'rgba(54, 162, 235, 0.2)',
+                                    'rgba(255, 206, 86, 0.2)',
+                                    'rgba(75, 192, 192, 0.2)',
+                                    'rgba(153, 102, 255, 0.2)',
+                                    'rgba(255, 159, 64, 0.2)'
+                                ],
+                                borderColor: [
+                                    'rgba(255, 99, 132, 1)',
+                                    'rgba(54, 162, 235, 1)',
+                                    'rgba(255, 206, 86, 1)',
+                                    'rgba(75, 192, 192, 1)',
+                                    'rgba(153, 102, 255, 1)',
+                                    'rgba(255, 159, 64, 1)'
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            legend: {
+                                position: 'left'
+                            },
+                            title: {
+                                display: true,
+                                text: "Numbers of votes for each option",
+                                fontSize: 20
+                            }
+                        }
+                    });
+                    listOfOptions = []
+                    listOfVoters = []
+                })
+        }
+
+        if (pollItemForm != null) {
+            pollItemForm.addEventListener("submit", (e) => {
+                e.preventDefault();
+
+                let optionsInPoll = Array.from(document.getElementsByName("poll-1"));
+
+                let optionsInPollValue;
+
+                const userID = document.getElementById("current-user-id").value;
+
+                for (var i = 0; i < optionsInPoll.length; i++) {
+                    if (optionsInPoll[i].checked) {
+                        optionsInPollValue = optionsInPoll[i].value;
+                    }
+                }
+
+                console.log(optionsInPollValue)
+
+                fetch(`/polls/add-voter/${pollID}`, {
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        method: "POST",
+                        body: JSON.stringify({
+                            voter_id: userID,
+                            optionIndex: parseInt(optionsInPollValue)
+                        })
+                    })
+                    .then(res => {
+                        return res.json()
+                    })
+                    .then(data => {
+                        console.log(data)
+                        window.location.reload()
+                    })
+            })
+        } else {
+            pollItemEditForm.addEventListener("submit", (e) => {
+                e.preventDefault();
+
+                let optionsInPoll = Array.from(document.getElementsByName(`poll-1`));
+                let optionsInPollValue;
+
+                const userID = document.getElementById("current-user-id").value;
+
+                for (var i = 0; i < optionsInPoll.length; i++) {
+                    if (optionsInPoll[i].checked) {
+                        optionsInPollValue = optionsInPoll[i].value;
+                    }
+                }
+
+                fetch(`/polls/edit-voter/${pollID}`, {
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        method: "PUT",
+                        body: JSON.stringify({
+                            voter_id: userID,
+                            optionIndex: parseInt(optionsInPollValue)
+                        })
+                    })
+                    .then(res => {
+                        return res.json()
+                    })
+                    .then(data => {
+                        console.log(data)
+                        window.location.reload()
+                    })
+            })
+        }
+    };
+</script>

@@ -1,0 +1,82 @@
+<div class="container mt-4">
+    <% if (polls.length > 0) { %>
+    <div class="polls-search-container">
+        <div class="poll-item">
+            <form action="" id="poll-search-form" class="w-100">
+                <div class="form-group">
+                    <input type="text" placeholder="Search for a question" name="search" id="search"
+                        class="form-control">
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-block">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="polls-container">
+        <% polls.forEach(function(poll, index){ %>
+        <div class="poll-item">
+            <div class="poll-item-content">
+                <h2><%= poll.question %></h2>
+                <h6>Created By: <%= authors[index].username %></h6>
+                <h6>Answered By: <%= poll.totalVoters %> Person (People)</h6>
+                <a href="/vote/<%= poll._id %>" class="btn  btn-primary">Vote</a>
+            </div>
+        </div>
+        <% }); %>
+    </div>
+
+    <nav class="mt-4">
+        <ul class="pagination d-flex justify-content-center">
+
+            <% if (parseInt(pages.currentPage) == 1) { %>
+            <li class="page-item disabled">
+                <a class="page-link" href="/?page=<%=parseInt(pages.currentPage) - 1%>" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            <% } else { %>
+            <li class="page-item">
+                <a class="page-link" href="/?page=<%=parseInt(pages.currentPage) - 1%>" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            <% } %>
+
+            <% pages.pages.forEach(function(page, index){ %>
+            <li class="page-item"><a class="page-link" href="/?page=<%=page%>"><%=page%></a></li>
+            <% }); %>
+
+            <% if (parseInt(pages.currentPage) == pages.totalPages) { %>
+            <li class="page-item disabled">
+                <a class="page-link" href="/?page=<%=parseInt(pages.currentPage) + 1%>" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            <% } else { %>
+            <li class="page-item">
+                <a class="page-link" href="/?page=<%=parseInt(pages.currentPage) + 1%>" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            <% } %>
+
+        </ul>
+    </nav>
+    <% } else { %>
+    <h1 class="text-center">There is nothing to display</h1>
+    <% } %>
+
+</div>
+
+<script>
+    let pollSearchFrom = document.getElementById('poll-search-form');
+
+    pollSearchFrom.addEventListener("submit", (e) => {
+        e.preventDefault();
+        let searchValue = document.getElementById('search').value;
+
+        window.location.href = `/?page=1&search=${searchValue}`
+    })
+</script>

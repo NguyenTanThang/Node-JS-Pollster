@@ -1,0 +1,43 @@
+@media (min-width: 768px) and (max-width: 1024px) {}
+
+@media (min-width: 320px) and (max-width: 1024px) {
+  .or {
+    flex: 100%;
+    margin-bottom: 20px;
+  }
+
+  .or::before {
+    display: none;
+  }
+
+  .or::after {
+    display: none;
+  }
+
+  .poll-item-content {
+    width: 100%;
+  }
+
+  .poll-item-chart {
+    width: 100%;
+  }
+}
+
+@media (min-width: 320px) and (max-width: 767px) {
+  .login-container {
+    width: 96%;
+  }
+
+  .oauth-button .button-icon {
+    margin-right: 20px;
+  }
+
+  .login-container-header {
+    flex-wrap: wrap;
+  }
+
+  .polls-form-container{
+    width: 100%;
+    max-width: 100%;
+  }
+}

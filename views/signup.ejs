@@ -1,0 +1,71 @@
+<div class="login-wrapper">
+    <div class="login-container">
+
+        <div class="login-container-header">
+            <h4>Create New Account</h4>
+            <a href="/">Already have an account? Sign In!</a>
+        </div>
+
+        <div class="login-form-container">
+            <form action="/users/signup" id="login-form">
+
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <div class="input-group-text">
+                            <i class="fas fa-user" aria-hidden="true"></i>
+                        </div>
+                    </div>
+                    <input type="text" class="form-control" id="username" name="username" placeholder="Your Username">
+                </div>
+
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <div class="input-group-text">
+                            <i class="fas fa-at" aria-hidden="true"></i>
+                        </div>
+                    </div>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="Your Email">
+                </div>
+
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <div class="input-group-text">
+                            <i class="fas fa-lock" aria-hidden="true"></i>
+                        </div>
+                    </div>
+                    <input type="password" class="form-control" id="password" name="password"
+                        placeholder="Your Password">
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success btn-block">
+                        Sign Up
+                    </button>
+                </div>
+
+            </form>
+        </div>
+
+        <div class="or">
+            <p>or</p>
+        </div>
+
+        <div class="oauth-login-container">
+            <a href="/user/auth/facebook" class="login-facebook btn btn-block oauth-button">
+                <div class="button-icon">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </div>
+                Sign Up with Facebook
+            </a>
+
+            <a href="/user/auth/facebook" class="login-google btn btn-block oauth-button">
+                <div class="button-icon">
+                    <i class="fab fa-google" aria-hidden="true"></i>
+                </div>
+                Sign Up with Google
+            </a>
+
+        </div>
+
+    </div>
+</div>

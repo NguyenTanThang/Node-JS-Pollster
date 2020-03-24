@@ -1,0 +1,132 @@
+<h2 class="text-center mt-4">Welcome <%= user.username %> to your profile</h2>
+
+<div class="container mt-4">
+    <% if (polls.length <= 0) { %>
+        <div class="text-center mt-4">
+            <h2>You do not have any active poll yet</h2>
+            <a href="/add-poll" class="btn btn-primary">Create Poll</a>
+        </div>
+        <% } else { %>
+            <div class="polls-container">
+                <% polls.forEach(function(poll, index){ %>
+                <div class="poll-item">
+                    <input type="hidden" name="user_id" id="user_id" value="<%=user._id%>">
+        
+                    <div class="poll-item-content">
+                        <h2><%= poll.question %></h2>
+                        <h6>Created By: <%= user.username %></h6>
+                        <h6>Answered By: <%= poll.totalVoters %> Person (People)</h6>
+        
+                        <ul class="list-group">
+                            <% poll.options.forEach(function(option, optionIndex){ %>
+                            <li class="list-group-item">
+                                <%= option.opinion %> (<%= option.votersCount %>)
+                            </li>
+                            <% }); %>
+                        </ul>
+        
+                        <div class="row">
+                            <div class="col-12">
+                                <button class="btn btn-danger btn-block delete-poll-btn" target-poll-id="<%= poll._id %>">Delete
+                                    Poll</button>
+                            </div>
+                        </div>
+        
+                    </div>
+        
+                    <div class="poll-item-chart">
+                        <% if (poll.totalVoters == 0) { %>
+                        <h2>No data to display yet</h2>
+                        <% } else { %>
+                        <canvas id="chart-poll-<%=index%>" width="100%" height="100%"></canvas>
+                        <% } %>
+                    </div>
+                </div>
+                <% }); %>
+            </div>
+            <% } %>
+    
+</div>
+
+<script>
+    const deletePollButtons = Array.from(document.querySelectorAll(".delete-poll-btn"));
+    const user_id = document.getElementById("user_id").value;
+
+    let listOfOptions = []
+    let listOfVoters = []
+    fetch(`/polls/get-polls-via-user-id/${user_id}`)
+        .then(res => {
+            return res.json()
+        })
+        .then(data => {
+            const polls = data.data;
+            console.log(polls);
+
+            polls.forEach((poll, index) => {
+                poll.options.forEach((option, optionIndex) => {
+                    //listOfOptions.push(`Option ${optionIndex+1}`)
+                    listOfOptions.push(`${option.opinion}`)
+                    listOfVoters.push(option.votersCount)
+                })
+                var ctx = document.getElementById(`chart-poll-${index}`).getContext('2d');
+                console.log(`chart-poll-${index}`);
+                var myChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: listOfOptions,
+                        datasets: [{
+                            label: '# of Votes',
+                            data: listOfVoters,
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.2)',
+                                'rgba(54, 162, 235, 0.2)',
+                                'rgba(255, 206, 86, 0.2)',
+                                'rgba(75, 192, 192, 0.2)',
+                                'rgba(153, 102, 255, 0.2)',
+                                'rgba(255, 159, 64, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 206, 86, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(153, 102, 255, 1)',
+                                'rgba(255, 159, 64, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        legend: {
+                            position: 'left'
+                        },
+                        title: {
+                            display: true,
+                            text: "Numbers of votes for each option",
+                            fontSize: 20
+                        }
+                    }
+                });
+
+                listOfOptions = []
+                listOfVoters = []
+            })
+        })
+
+    deletePollButtons.forEach((deletePollButton, index) => {
+        const pollID = deletePollButton.getAttribute("target-poll-id")
+
+        deletePollButton.addEventListener("click", (e) => {
+            fetch(`/polls/delete/${pollID}`, {
+                    method: "DELETE"
+                })
+                .then(res => res.json())
+                .then(data => {
+                    console.log(data);
+                    setTimeout(() => {
+                        window.location.reload()
+                    }, 200)
+                })
+        })
+    })
+</script>
