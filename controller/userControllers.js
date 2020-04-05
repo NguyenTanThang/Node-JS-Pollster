@@ -36,10 +36,7 @@ const signUp = async (req, res, next) => {
             password
         }).save()
 
-        return res.status(200).json({
-            success: true,
-            user: createdUser
-        });
+        return res.redirect("/login");
 
     } catch (error) {
         if (error.name === 'ValidationError') {

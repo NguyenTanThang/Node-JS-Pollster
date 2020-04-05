@@ -102,7 +102,7 @@ passport.use(new LocalStrategy({
       if (existedUser) {
         return done(null, existedUser)
       } else {
-        return done(true, null)
+        return done(null, false)
       }
 
     } catch (error) {
