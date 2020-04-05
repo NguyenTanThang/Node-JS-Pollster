@@ -7,7 +7,7 @@
         </div>
 
         <div class="login-form-container">
-            <form action="/users/signup" id="login-form">
+            <form action="/users/signup" id="login-form" method="POST">
 
                 <div class="input-group">
                     <div class="input-group-prepend">
@@ -51,14 +51,14 @@
         </div>
 
         <div class="oauth-login-container">
-            <a href="/user/auth/facebook" class="login-facebook btn btn-block oauth-button">
+            <a href="/users/auth/facebook" class="login-facebook btn btn-block oauth-button">
                 <div class="button-icon">
                     <i class="fab fa-facebook" aria-hidden="true"></i>
                 </div>
                 Sign Up with Facebook
             </a>
 
-            <a href="/user/auth/facebook" class="login-google btn btn-block oauth-button">
+            <a href="/users/auth/google" class="login-google btn btn-block oauth-button">
                 <div class="button-icon">
                     <i class="fab fa-google" aria-hidden="true"></i>
                 </div>
