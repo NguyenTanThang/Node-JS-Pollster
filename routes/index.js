@@ -145,10 +145,16 @@ router.get("/add-poll", async (req, res) => {
 
 
 router.get("/login", (req, res) => {
+    if (req.user){
+        return res.redirect("/profile");
+    }
     res.render("login");
 })
 
 router.get("/signup", (req, res) => {
+    if (req.user){
+        return res.redirect("/profile");
+    }
     res.render("signup");
 })
 
