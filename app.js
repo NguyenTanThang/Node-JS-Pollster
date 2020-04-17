@@ -35,7 +35,7 @@ app.use(session({
   secret: process.env.SESS_SECRET,
   resave: false,
   saveUninitialized: true,
-  maxAge: 3600 * 1000 * 24,
+  maxAge: 3600 * 1000,
   store: new MongoStore({ mongooseConnection: mongoose.connection })
 }))
 app.use(passport.initialize())
