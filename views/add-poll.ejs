@@ -1,5 +1,7 @@
 <div class="container mt-4">
     <div class="polls-form-container">
+        <div class="form-validation"></div>
+
         <div class="poll-form">
 
             <form action="/polls/add" method="post" id="add-poll-form">
@@ -10,13 +12,13 @@
 
                 <div class="form-group">
                     <label for="question">Question:</label>
-                    <input type="text" placeholder="Question" class="form-control" id="question" name="question">
+                    <input type="text" placeholder="Question" class="form-control" id="question" name="question" required>
                 </div>
 
                 <div class="form-group">
                     <label for="author">Author:</label>
                     <input type="text" disabled placeholder="Author" class="form-control" id="author" name="author"
-                        value="<%=user.username%>">
+                        value="<%=user.username%>" required>
                 </div>
 
                 <div class="form-group">
@@ -48,6 +50,7 @@
         numberOfOptions = 2
         localStorage.setItem("numberOfOptions", numberOfOptions)
     }
+    const formValidation = document.querySelector(".form-validation")
     const optionsContainer = document.getElementById("options-container");
     const addOptionButton = document.getElementById("add-option-btn");
     const removeOptionButton = document.getElementById("remove-option-btn");
@@ -55,51 +58,76 @@
     const addPollForm = document.getElementById("add-poll-form");
     const user_id = document.getElementById("user_id").value;
 
+    const createAlert = (message) => {
+        return `<div class="alert alert-warning alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>`
+    }
+
     addPollForm.addEventListener("submit", (e) => {
         e.preventDefault();
 
+        if (!questionInput.value){
+            const alert = createAlert("A poll must contain a question");
+            formValidation.innerHTML = alert;
+            return;
+        }
+
         let options = [];
+        let optionChecker = true;
 
         for (let index = 0; index < numberOfOptions; index++) {
-            if (localStorage.getItem(`option-${index}`) != undefined) {
+            if (localStorage.getItem(`option-${index}`)) {
                 options.push({
                     opinion: localStorage.getItem(`option-${index}`)
                 })
+            } else {
+                const alert = createAlert("You should enter a value or remove option number " + index);
+                formValidation.innerHTML = alert;
+                optionChecker = false;
             }
         }
 
-        fetch("/polls/add", {
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            method: "POST",
-            body: JSON.stringify({
-                user_id,
-                question: questionInput.value,
-                options
+        if (optionChecker){
+            fetch("/polls/add", {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                method: "POST",
+                body: JSON.stringify({
+                    user_id,
+                    question: questionInput.value,
+                    options
+                })
             })
-        })
-        .then(res => res.json())
-        .then(data => console.log(data))
+            .then(res => res.json())
+            .then(data => console.log(data))
 
-        localStorage.setItem(`question`, "");
-        localStorage.setItem("numberOfOptions", 2)
-        for (let index = 0; index < numberOfOptions; index++) {
-            if (localStorage.getItem(`option-${index}`) != undefined) {
-                localStorage.setItem(`option-${index}`, "");
+            localStorage.setItem(`question`, "");
+            localStorage.setItem("numberOfOptions", 2)
+            for (let index = 0; index < numberOfOptions; index++) {
+                if (localStorage.getItem(`option-${index}`) != undefined) {
+                    localStorage.setItem(`option-${index}`, "");
+                }
             }
-        }
 
-        setTimeout(() => {
-            window.location.href = "/profile"
-        }, 500)
+            setTimeout(() => {
+                window.location.href = "/profile"
+            }, 500)
+        }
     })
 
     addOptionButton.addEventListener("click", (e) => {
         e.preventDefault();
         if (localStorage.getItem("numberOfOptions") == 5){
-            return window.location.reload();
+            const alert = createAlert("A poll cannot have more than 5 options");
+            formValidation.innerHTML = alert;
+            return;
+            //return window.location.reload();
         }
         localStorage.setItem("numberOfOptions", parseInt(numberOfOptions) + 1)
         return window.location.reload();
@@ -108,7 +136,10 @@
     removeOptionButton.addEventListener("click", (e) => {
         e.preventDefault();
         if (localStorage.getItem("numberOfOptions") == 2){
-            return window.location.reload();
+            const alert = createAlert("A poll cannot have less than 2 options");
+            formValidation.innerHTML = alert;
+            return;
+            //return window.location.reload();
         }
         localStorage.setItem("numberOfOptions", numberOfOptions - 1)
         return window.location.reload();
@@ -127,6 +158,7 @@
         if (localStorage.getItem(`option-${index}`) != undefined) {
             input.setAttribute("value", localStorage.getItem(`option-${index}`));
         }
+        input.setAttribute("required", "true");
         input.setAttribute("class", "form-control mb-2");
         input.setAttribute("id", `option-${index+1}`);
         input.setAttribute("name", `option-${index+1}`);
