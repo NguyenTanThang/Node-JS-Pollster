@@ -30,6 +30,4 @@ router.post("/add-voter/:id", addVoterToPoll)
 
 router.put("/edit-voter/:id", editVoterInPoll)
 
-
-
 module.exports = router;

@@ -9,15 +9,18 @@ router.get("/:id", async (req, res) => {
     } = req.params;
 
     try {
-        const checkVoter = (voters) => {
+        let selectedOption = "N/A";
+        const checkVoter = (option) => {
             let tof = false;
+            const voters = option.voters;
     
             for (let index = 0; index < voters.length; index++) {
                 const voter = voters[index];
                 console.log(voter);
                 console.log(req.user._id);
                 if (voter.voter_id == req.user._id) {
-                    tof = true
+                    tof = true;
+                    selectedOption = option.opinion;
                     break;
                 }
                 if (voters.length - 1 === index && tof === false) {
@@ -34,7 +37,7 @@ router.get("/:id", async (req, res) => {
 
         for (let index = 0; index < poll.options.length; index++) {
             const option = poll.options[index];
-            if (checkVoter(option.voters)) {
+            if (checkVoter(option)) {
                 disabled = "disabled";
                 break;
             }
@@ -47,13 +50,15 @@ router.get("/:id", async (req, res) => {
         console.log({
             poll,
             author,
-            disabled
+            disabled,
+            selectedOption
         })
 
         return res.render("single-poll", {
             poll,
             author,
-            disabled
+            disabled,
+            selectedOption
         })
     } catch (error) {
         console.log(error);

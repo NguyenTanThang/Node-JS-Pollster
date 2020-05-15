@@ -64,6 +64,7 @@
                 <h2><%= poll.question %></h2>
                 <h6>Created By: <%= author.username %></h6>
                 <h6>Answered By: <%= poll.totalVoters %> Person (People)</h6>
+                <h6>Selected Option: <%= selectedOption %></h6>
 
                 <input type="hidden" value="<%=poll._id%>" id="poll_id" name="poll_id" />
 
