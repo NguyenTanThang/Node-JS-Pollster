@@ -45,7 +45,11 @@
             <% } %>
 
             <% pages.pages.forEach(function(page, index){ %>
-            <li class="page-item"><a class="page-link" href="/?page=<%=page%>"><%=page%></a></li>
+                <% if (pages.currentPage == page){ %>
+                    <li class="page-item active"><a class="page-link" href="/?page=<%=page%>"><%=page%></a></li>
+                <% } else { %>
+                    <li class="page-item"><a class="page-link" href="/?page=<%=page%>"><%=page%></a></li>
+                <% } %>
             <% }); %>
 
             <% if (parseInt(pages.currentPage) == pages.totalPages) { %>

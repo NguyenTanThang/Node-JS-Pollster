@@ -39,6 +39,12 @@ router.get("/", async (req, res) => {
         let authors = [];
         let disables = [];
 
+        if (search) {
+            polls = polls.filter(pollItem => {
+                return pollItem.question.includes(search);
+            })
+        }
+
         const pages = pagination(polls.length, page, 5, 5);
         console.log(pages);
 
